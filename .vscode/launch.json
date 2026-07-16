@@ -19,7 +19,7 @@
         },
         {
             "type": "rdbg",
-            "name": "Attach to backend container",
+            "name": "Attach rdbg (docker:backend)",
             "request": "attach",
             "debugPort": "localhost:12345",
             "localfsMap": "/rails:${workspaceFolder}/backend"
