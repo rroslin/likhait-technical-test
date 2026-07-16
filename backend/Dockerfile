@@ -29,6 +29,11 @@ RUN bundle exec bootsnap precompile --gemfile app/ lib/
 # Entrypoint prepares the database
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
-# Start the server by default
+# Expose the rails server port
 EXPOSE 3000
+
+# Expose the debug port for rdbg
+EXPOSE 12345
+
+# Start the server
 CMD ["bin/rails", "server", "-b", "0.0.0.0"]
