@@ -3,7 +3,7 @@
  */
 
 import React, { useState } from "react";
-import { Expense, ExpenseFormData } from "../types";
+import { Category, Expense, ExpenseFormData } from "../types";
 import { formatCurrency, formatDate } from "../utils/expenseUtils";
 import { getCategoryEmoji } from "../constants/categoryEmojis";
 import { COLORS } from "../constants/colors";
@@ -12,6 +12,7 @@ import { ExpenseForm } from "./ExpenseForm.tsx";
 import { deleteExpense, updateExpense } from "../services/api";
 
 interface CalendarExpenseTableProps {
+  categories: Category[];
   expenses: Expense[];
   onExpenseUpdated: () => void;
 }
@@ -19,6 +20,7 @@ interface CalendarExpenseTableProps {
 const ITEMS_PER_PAGE = 10;
 
 export function CalendarExpenseTable({
+  categories,
   expenses,
   onExpenseUpdated,
 }: CalendarExpenseTableProps) {
@@ -188,6 +190,7 @@ export function CalendarExpenseTable({
       >
         {editingExpense && (
           <ExpenseForm
+            categories={categories}
             initialData={{
               amount: editingExpense.amount.toString(),
               description: editingExpense.description,

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { getExpenses, createExpense } from "../services/api";
-import { Expense, ExpenseFormData } from "../types";
+import { getExpenses, createExpense, fetchCategories } from "../services/api";
+import { Category, Expense, ExpenseFormData } from "../types";
 import YearNavigation from "../components/YearNavigation";
 import { MonthNavigation } from "../components/MonthNavigation";
 import CategoryBreakdown from "../components/CategoryBreakdown";
@@ -11,6 +11,7 @@ import { COLORS } from "../constants/colors";
 
 const HistoryPage: React.FC = () => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [availableCategories, setAvailableCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -49,6 +50,10 @@ const HistoryPage: React.FC = () => {
     fetchExpenses();
   }, [selectedYear, selectedMonth]);
 
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
   const fetchExpenses = async () => {
     try {
       setLoading(true);
@@ -58,6 +63,15 @@ const HistoryPage: React.FC = () => {
       console.error("Error fetching expenses:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadCategories = async () => {
+    try {
+      const data = await fetchCategories();
+      setAvailableCategories(data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
     }
   };
 
@@ -171,6 +185,7 @@ const HistoryPage: React.FC = () => {
             />
             <div style={{ marginTop: "32px" }}>
               <CalendarExpenseTable
+                categories={availableCategories}
                 expenses={expenses}
                 onExpenseUpdated={fetchExpenses}
               />
@@ -185,6 +200,7 @@ const HistoryPage: React.FC = () => {
         title="Add New Expense"
       >
         <ExpenseForm
+          categories={availableCategories}
           onSubmit={handleAddExpense}
           onCancel={() => setIsModalOpen(false)}
         />
