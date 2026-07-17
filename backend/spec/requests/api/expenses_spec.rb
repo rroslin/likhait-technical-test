@@ -106,4 +106,25 @@ RSpec.describe "Api::Expenses", type: :request do
       end
     end
   end
+
+  describe "PUT /api/expenses/:id" do
+    it "rejects updating an expense to a future date" do
+      expense = Expense.create!(
+        description: "Lunch",
+        amount: 100.00,
+        category: food_category,
+        date: Date.current
+      )
+
+      put "/api/expenses/#{expense.id}", params: {
+        expense: { date: Date.current + 1.day }
+      }, as: :json
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(JSON.parse(response.body)["errors"]).to include(
+        "Date cannot be in the future"
+      )
+      expect(expense.reload.date).to eq(Date.current)
+    end
+  end
 end
