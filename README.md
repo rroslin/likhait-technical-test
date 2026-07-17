@@ -179,6 +179,21 @@ docker compose exec backend rails db:reset
 docker compose exec backend rails console
 ```
 
+### Repair Future-Dated Expenses
+
+Audit future-dated expenses without modifying data:
+
+```bash
+docker compose exec backend bin/rails expenses:fix_future_dates
+```
+
+After reviewing the output, apply the correction to move those expenses to
+today's date:
+
+```bash
+docker compose exec -e APPLY=true backend bin/rails expenses:fix_future_dates
+```
+
 ### Without Docker
 
 ```bash
