@@ -1,6 +1,11 @@
 class Api::ExpensesController < ApplicationController
+  SORTABLE_COLUMNS = %w[date created_at].freeze
+  SORT_DIRECTIONS = %w[asc desc].freeze
+
   def index
-    expenses = Expense.includes(:category).order(created_at: :desc)
+    return render_invalid_sort if invalid_sort_params?
+
+    expenses = Expense.includes(:category).order(expense_order)
 
     if params[:year].present? && params[:month].present?
       year = params[:year].to_i
@@ -42,6 +47,28 @@ class Api::ExpensesController < ApplicationController
   end
 
   private
+
+  def invalid_sort_params?
+    return false unless params[:sort_by].present? || params[:sort_order].present?
+
+    !SORTABLE_COLUMNS.include?(params[:sort_by]) || !SORT_DIRECTIONS.include?(params[:sort_order])
+  end
+
+  def render_invalid_sort
+    render json: { error: "sort_by must be one of: #{SORTABLE_COLUMNS.join(', ')} and sort_order must be one of: #{SORT_DIRECTIONS.join(', ')}" }, status: :bad_request
+  end
+
+  def expense_order
+    return { created_at: :desc } unless params[:sort_by].present?
+
+    direction = params[:sort_order].to_sym
+
+    if params[:sort_by] == "date"
+      { date: direction, created_at: direction, id: direction }
+    else
+      { created_at: direction, id: direction }
+    end
+  end
 
   def expense_params
     params.require(:expense).permit(:description, :amount, :category_id, :date)
