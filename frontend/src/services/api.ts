@@ -57,7 +57,8 @@ export async function createCategory(name: string): Promise<Category> {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to create category");
+    const body = (await response.json()) as { errors?: string[] };
+    throw new Error(body.errors?.join(", ") || "Failed to create category");
   }
 
   return response.json();
