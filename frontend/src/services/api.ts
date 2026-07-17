@@ -101,12 +101,28 @@ export async function updateExpense(
   id: number,
   data: Partial<ExpenseFormData>,
 ): Promise<Expense> {
+  const { category, ...expenseData } = data;
+  const updatedExpenseData: Omit<Partial<ExpenseFormData>, "category"> & {
+    category_id?: number;
+  } = expenseData;
+
+  if (category !== undefined) {
+    const categories = await fetchCategories();
+    const selectedCategory = categories.find((item) => item.name === category);
+
+    if (!selectedCategory) {
+      throw new Error("Selected category no longer exists");
+    }
+
+    updatedExpenseData.category_id = selectedCategory.id;
+  }
+
   const response = await fetch(`${API_BASE_URL}/expenses/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ expense: data }),
+    body: JSON.stringify({ expense: updatedExpenseData }),
   });
 
   if (!response.ok) {
