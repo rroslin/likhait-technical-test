@@ -42,7 +42,7 @@ export function groupExpensesByDay(expenses: Expense[]) {
   const grouped = new Map<number, Expense[]>();
 
   expenses.forEach((expense) => {
-    const day = new Date(expense.date).getDate();
+    const day = new Date(expense.expensed_at).getDate();
     const dayExpenses = grouped.get(day) || [];
     dayExpenses.push(expense);
     grouped.set(day, dayExpenses);

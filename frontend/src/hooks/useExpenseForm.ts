@@ -16,7 +16,7 @@ export function useExpenseForm({ initialData, onSubmit }: UseExpenseFormProps) {
     amount: initialData?.amount || "",
     description: initialData?.description || "",
     category: initialData?.category || "",
-    date: initialData?.date || formatDate(new Date()),
+    expensed_at: initialData?.expensed_at || formatDate(new Date()),
   });
 
   const [errors, setErrors] = useState<Partial<ExpenseFormData>>({});
@@ -45,8 +45,8 @@ export function useExpenseForm({ initialData, onSubmit }: UseExpenseFormProps) {
       newErrors.category = "Category is required";
     }
 
-    if (!formData.date) {
-      newErrors.date = "Date is required";
+    if (!formData.expensed_at) {
+      newErrors.expensed_at = "Date is required";
     }
 
     setErrors(newErrors);
@@ -68,7 +68,7 @@ export function useExpenseForm({ initialData, onSubmit }: UseExpenseFormProps) {
         amount: "",
         description: "",
         category: "",
-        date: formatDate(new Date()),
+        expensed_at: formatDate(new Date()),
       });
       setErrors({});
     } catch (error) {
@@ -83,7 +83,7 @@ export function useExpenseForm({ initialData, onSubmit }: UseExpenseFormProps) {
       amount: initialData?.amount || "",
       description: initialData?.description || "",
       category: initialData?.category || "",
-      date: initialData?.date || formatDate(new Date()),
+      expensed_at: initialData?.expensed_at || formatDate(new Date()),
     });
     setErrors({});
   };
