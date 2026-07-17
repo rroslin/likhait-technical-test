@@ -25,7 +25,7 @@ export async function getExpenses(
   month: number,
 ): Promise<Expense[]> {
   const response = await fetch(
-    `${API_BASE_URL}/expenses?year=${year}&month=${month}`,
+    `${API_BASE_URL}/expenses?year=${year}&month=${month}&sort_by=date&sort_order=desc`,
   );
   if (!response.ok) {
     throw new Error("Failed to fetch expenses");
