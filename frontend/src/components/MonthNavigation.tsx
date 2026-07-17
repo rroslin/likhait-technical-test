@@ -58,8 +58,6 @@ export function MonthNavigation({
     display: "grid",
     gridTemplateColumns: "repeat(12, 1fr)",
     gap: "12px",
-    maxWidth: "900px",
-    marginRight: "32px",
     flex: 1,
   };
 
