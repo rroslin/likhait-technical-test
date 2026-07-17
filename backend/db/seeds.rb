@@ -145,7 +145,7 @@ while current_date <= end_date
         description: template[:description],
         amount: amount,
         category: category,
-        date: current_date,
+        expensed_at: current_date,
         created_at: current_date,
         updated_at: current_date
       )
