@@ -9,7 +9,7 @@ WORKDIR /rails
 
 # Install base packages
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential ca-certificates default-mysql-client default-libmysqlclient-dev git && \
+    apt-get install --no-install-recommends -y build-essential ca-certificates default-mysql-client default-libmysqlclient-dev git libyaml-dev && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Install application gems
@@ -29,6 +29,11 @@ RUN bundle exec bootsnap precompile --gemfile app/ lib/
 # Entrypoint prepares the database
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
-# Start the server by default
+# Expose the rails server port
 EXPOSE 3000
-CMD ["rails", "server", "-b", "0.0.0.0"]
+
+# Expose the debug port for rdbg
+EXPOSE 12345
+
+# Start the server
+CMD ["bin/rails", "server", "-b", "0.0.0.0"]

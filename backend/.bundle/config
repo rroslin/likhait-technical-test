@@ -1,0 +1,2 @@
+---
+BUNDLE_BUILD__MYSQL2: "--with-mysql-config=/opt/homebrew/opt/mysql/bin/mysql_config --with-ldflags=-L/opt/homebrew/opt/zstd/lib"

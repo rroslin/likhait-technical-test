@@ -1,0 +1,17 @@
+#!/bin/sh
+set -eu
+
+# node_modules is a named volume, so retain a signature there to avoid
+# reinstalling dependencies on every container start.
+signature="$({ sha256sum package.json package-lock.json; node --version; uname -m; } | sha256sum | awk '{print $1}')"
+signature_file="node_modules/.dependency-signature"
+
+if [ ! -f "$signature_file" ] || [ "$(cat "$signature_file")" != "$signature" ]; then
+  echo "Dependency signature changed; running npm ci..."
+  npm ci
+  printf '%s\n' "$signature" > "$signature_file"
+else
+  echo "Dependencies are current; skipping npm ci."
+fi
+
+exec npm run dev -- --host
