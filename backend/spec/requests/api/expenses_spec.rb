@@ -5,8 +5,24 @@ RSpec.describe "Api::Expenses", type: :request do
   let!(:transport_category) { Category.create!(name: "Transport") }
 
   describe "GET /api/expenses" do
-  let!(:expense1) { Expense.create!(description: "Lunch", amount: 100.00, category: food_category, date: Date.today) }
-  let!(:expense2) { Expense.create!(description: "Taxi", amount: 50.00, category: transport_category, date: Date.today) }
+    let!(:expense1) do
+      Expense.create!(
+        description: "Lunch",
+        amount: 100.00,
+        category: food_category,
+        date: Date.new(2026, 1, 15),
+        created_at: Time.zone.parse("2026-01-20 09:00:00")
+      )
+    end
+    let!(:expense2) do
+      Expense.create!(
+        description: "Taxi",
+        amount: 50.00,
+        category: transport_category,
+        date: Date.new(2026, 1, 16),
+        created_at: Time.zone.parse("2026-01-20 10:00:00")
+      )
+    end
 
     it "returns all expenses with category information" do
       get "/api/expenses"
@@ -22,6 +38,45 @@ RSpec.describe "Api::Expenses", type: :request do
       json = JSON.parse(response.body)
       expect(json.first["id"]).to eq(expense2.id)
       expect(json.last["id"]).to eq(expense1.id)
+    end
+
+    it "sorts by expense date when requested" do
+      get "/api/expenses", params: { sort_by: "date", sort_order: "desc" }
+
+      json = JSON.parse(response.body)
+      expect(json.map { |expense| expense["id"] }).to eq([expense2.id, expense1.id])
+    end
+
+    it "uses created_at and id as tie-breakers when sorting by date" do
+      earlier_expense = Expense.create!(
+        description: "Earlier entry",
+        amount: 75.00,
+        category: food_category,
+        date: Date.new(2026, 1, 17),
+        created_at: Time.zone.parse("2026-01-20 08:00:00")
+      )
+      later_expense = Expense.create!(
+        description: "Later entry",
+        amount: 125.00,
+        category: food_category,
+        date: Date.new(2026, 1, 17),
+        created_at: Time.zone.parse("2026-01-20 11:00:00")
+      )
+
+      get "/api/expenses", params: { sort_by: "date", sort_order: "desc" }
+
+      json = JSON.parse(response.body)
+      same_date_ids = json.filter_map do |expense|
+        expense["id"] if [earlier_expense.id, later_expense.id].include?(expense["id"])
+      end
+      expect(same_date_ids).to eq([later_expense.id, earlier_expense.id])
+    end
+
+    it "rejects invalid sorting parameters" do
+      get "/api/expenses", params: { sort_by: "amount", sort_order: "sideways" }
+
+      expect(response).to have_http_status(:bad_request)
+      expect(JSON.parse(response.body)["error"]).to include("sort_by must be one of")
     end
   end
 
